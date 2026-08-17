@@ -8,7 +8,7 @@ import base64
 # 1. Configuração da página (Deve ser a primeira linha)
 st.set_page_config(page_title="Monitor de Associados ANABB 70+", layout="wide")
 
-# 2. Função para colocar a imagem de fundo e arrumar o logo do topo
+# 2. Função para colocar a imagem de fundo e ajustar os espaços
 def add_bg_from_local(image_file):
     with open(image_file, "rb") as file:
         encoded_string = base64.b64encode(file.read()).decode()
@@ -18,18 +18,18 @@ def add_bg_from_local(image_file):
     .stApp {{
         background-image: url(data:image/jpeg;base64,{encoded_string});
         background-size: cover;
-        background-position: top; /* <--- ISSO GARANTE QUE O TOPO NUNCA SEJA CORTADO */
+        background-position: center;
         background-attachment: fixed;
     }}
     /* Deixar o fundo das tabelas levemente transparente/branco para leitura */
     .stDataFrame {{
-        background-color: rgba(255, 255, 255, 0.95);
+        background-color: rgba(255, 255, 255, 0.9);
         border-radius: 10px;
         padding: 10px;
     }}
-    /* Ajusta o espaço do conteúdo para não ficar em cima da faixa preta do logo */
+    /* Reduzir o espaço vazio gigantesco no topo da página */
     .block-container {{
-        padding-top: 5.5rem; 
+        padding-top: 2rem;
     }}
     </style>
     """,
@@ -65,7 +65,7 @@ df_uf['Porcentagem'] = (df_uf['Quantidade'] / total_base) * 100
 
 st.title("Monitor de Associados por Estado")
 
-# 5. Dividindo a tela
+# 5. Dividindo a tela: Ajustei a proporção para o mapa ganhar mais destaque
 col1, col2 = st.columns([6, 4])
 
 with col1:
@@ -76,11 +76,11 @@ with col1:
         locations='UF',
         featureidkey="properties.sigla",
         color='Porcentagem',
-        color_continuous_scale="Blues", 
-        custom_data=['Quantidade', 'Porcentagem'] 
+        color_continuous_scale="Blues", # Cores parecidas com a sua imagem
+        custom_data=['Quantidade', 'Porcentagem'] # Dados para o balãozinho
     )
     
-    # Ajustando o mapa
+    # Ajustando o mapa: Aumentei a altura para 650
     fig.update_geos(fitbounds="locations", visible=False, bgcolor='rgba(0,0,0,0)')
     fig.update_layout(
         height=650, 
@@ -90,7 +90,7 @@ with col1:
         coloraxis_showscale=False 
     )
     
-    # Formatando o balão do mouse (Hover)
+    # Formatando o balão do mouse (Hover) lindamente
     fig.update_traces(hovertemplate="<b>Estado: %{location}</b><br>Associados: %{customdata[0]}<br>Base: %{customdata[1]:.2f}%<extra></extra>")
     
     # Mostra o mapa e captura o clique
@@ -122,5 +122,6 @@ with col2:
         # Mensagem padrão antes de clicar
         st.info("👈 Clique em um estado no mapa para ver a lista de cidades aqui.")
         
+        # Opcional: Mostrar o Top 5 geral enquanto não clica
         st.write("**Top 5 Estados Gerais:**")
         st.dataframe(df_uf[['UF', 'Quantidade']].sort_values('Quantidade', ascending=False).head(5), hide_index=True)
