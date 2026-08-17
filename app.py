@@ -8,7 +8,7 @@ import base64
 # 1. Configuração da página (Deve ser a primeira linha)
 st.set_page_config(page_title="Monitor de Associados ANABB 70+", layout="wide")
 
-# 2. Função para colocar a imagem de fundo
+# 2. Função para colocar a imagem de fundo e ajustar os espaços
 def add_bg_from_local(image_file):
     with open(image_file, "rb") as file:
         encoded_string = base64.b64encode(file.read()).decode()
@@ -27,6 +27,10 @@ def add_bg_from_local(image_file):
         border-radius: 10px;
         padding: 10px;
     }}
+    /* Reduzir o espaço vazio gigantesco no topo da página */
+    .block-container {{
+        padding-top: 2rem;
+    }}
     </style>
     """,
     unsafe_allow_html=True
@@ -36,7 +40,7 @@ def add_bg_from_local(image_file):
 try:
     add_bg_from_local('Fundo.jpg')
 except Exception as e:
-    st.warning("Imagem 'Fundo.jpg' não encontrada no repositório. O painel continuará funcionando sem ela.")
+    pass
 
 # 3. Carregando os Dados
 @st.cache_data
@@ -58,12 +62,11 @@ brazil_states = load_geojson()
 total_base = len(df)
 df_uf = df.groupby('UF').size().reset_index(name='Quantidade')
 df_uf['Porcentagem'] = (df_uf['Quantidade'] / total_base) * 100
-df_uf['Texto_Hover'] = df_uf.apply(lambda row: f"{row['Quantidade']} associados<br>{row['Porcentagem']:.2f}%", axis=1)
 
 st.title("Monitor de Associados por Estado")
 
-# 5. Dividindo a tela: Mapa na esquerda (70%) e Tabela na direita (30%)
-col1, col2 = st.columns([7, 3])
+# 5. Dividindo a tela: Ajustei a proporção para o mapa ganhar mais destaque
+col1, col2 = st.columns([6, 4])
 
 with col1:
     # Criando o Mapa Coroplético do Brasil
@@ -74,18 +77,21 @@ with col1:
         featureidkey="properties.sigla",
         color='Porcentagem',
         color_continuous_scale="Blues", # Cores parecidas com a sua imagem
-        hover_name='UF',
-        hover_data={'UF': False, 'Porcentagem': False, 'Texto_Hover': True}
+        custom_data=['Quantidade', 'Porcentagem'] # Dados para o balãozinho
     )
     
-    # Ajustando o mapa para ser transparente e focar no Brasil
+    # Ajustando o mapa: Aumentei a altura para 650
     fig.update_geos(fitbounds="locations", visible=False, bgcolor='rgba(0,0,0,0)')
     fig.update_layout(
+        height=650, 
         margin={"r":0,"t":0,"l":0,"b":0},
-        paper_bgcolor='rgba(0,0,0,0)', # Fundo transparente para ver a imagem
+        paper_bgcolor='rgba(0,0,0,0)', 
         plot_bgcolor='rgba(0,0,0,0)',
-        coloraxis_showscale=False # Oculta a barra de cores lateral para ficar mais limpo
+        coloraxis_showscale=False 
     )
+    
+    # Formatando o balão do mouse (Hover) lindamente
+    fig.update_traces(hovertemplate="<b>Estado: %{location}</b><br>Associados: %{customdata[0]}<br>Base: %{customdata[1]:.2f}%<extra></extra>")
     
     # Mostra o mapa e captura o clique
     event = st.plotly_chart(fig, use_container_width=True, on_select="rerun")
