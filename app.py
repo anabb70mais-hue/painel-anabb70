@@ -6,7 +6,7 @@ import json
 import base64
 
 # 1. Configuração da página (Deve ser a primeira linha)
-st.set_page_config(page_title="Monitor de Associados ANABB 70+", layout="wide")
+st.set_page_config(page_title="Monitoramento Associados 70+", layout="wide")
 
 # 2. Função para colocar a imagem de fundo e ajustar os espaços
 def add_bg_from_local(image_file):
