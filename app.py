@@ -155,10 +155,13 @@ with col1:
             """, unsafe_allow_html=True)
             
     with subcol2:
-        st.markdown("""
+        # Formata o total geral para ter ponto separando os milhares (ex: 40.574)
+        total_formatado = f"{total_base:,}".replace(",", ".")
+        
+        st.markdown(f"""
         <div class="metric-card" style="padding-top: 25px; padding-bottom: 25px;">
             <p style="margin:0; color:#1f3b73; font-weight:bold; font-size:16px;">Evolução de Associados</p>
-            <div style="font-size: 28px; font-weight: bold; color: #4CAF50;">↗ 40.000 <span style="font-size:14px; color:#666;">(2026)</span></div>
+            <div style="font-size: 28px; font-weight: bold; color: #4CAF50;">↗ {total_formatado} <span style="font-size:14px; color:#666;">(2026)</span></div>
             <div style="font-size: 16px; color: #888; margin-top:5px;">35.000 <span style="font-size:12px;">(2025)</span></div>
         </div>
         """, unsafe_allow_html=True)
@@ -167,7 +170,7 @@ with col2:
     if len(event.selection.points) > 0:
         estado_selecionado = event.selection.points[0]['location']
         
-        # TRADUZINDO TAMBÉM O TÍTULO DA TABELA LATERAL (OPCIONAL, MAS RECOMENDADO)
+        # TRADUZINDO O TÍTULO DA TABELA LATERAL
         nome_completo_tabela = nomes_estados.get(estado_selecionado, estado_selecionado)
         st.subheader(f"Detalhamento: {nome_completo_tabela}")
         
