@@ -71,7 +71,7 @@ total_base = len(df)
 df_uf = df.groupby('UF').size().reset_index(name='Quantidade')
 df_uf['Porcentagem'] = (df_uf['Quantidade'] / total_base) * 100
 
-# Base de Dados Consolidada do WhatsApp (Extraída da imagem anterior)
+# Base de Dados Consolidada do WhatsApp
 whatsapp_data = {
     'DF': 198, 'MG': 164, 'CE': 133, 'PB': 120, 'BA': 114, 'RS': 108,
     'PR': 99, 'SP': 95, 'RN': 91, 'PE': 90, 'RJ': 80, 'GO': 79,
@@ -79,7 +79,8 @@ whatsapp_data = {
     'AM': 32, 'MT': 31, 'SC': 19, 'TO': 19, 'SE': 15
 }
 
-st.title("Monitor de Associados por Estado")
+# TÍTULO ATUALIZADO: Centralizado, na cor branca e com o novo texto
+st.markdown("<h1 style='text-align: center; color: white;'>Monitoramento de Associados por Estado</h1>", unsafe_allow_html=True)
 
 # 5. Dividindo a tela
 col1, col2 = st.columns([6, 4])
@@ -96,7 +97,7 @@ with col1:
         custom_data=['Quantidade', 'Porcentagem'] 
     )
     
-    # Ajustando o mapa (altura reduzida levemente para caber os quadros novos)
+    # Ajustando o mapa
     fig.update_geos(fitbounds="locations", visible=False, bgcolor='rgba(0,0,0,0)')
     fig.update_layout(
         height=550, 
@@ -111,7 +112,7 @@ with col1:
     # Mostra o mapa e captura o clique
     event = st.plotly_chart(fig, use_container_width=True, on_select="rerun")
     
-    # NOVAS INSERÇÕES: Caixas de resumo lado a lado sob o mapa
+    # Caixas de resumo lado a lado sob o mapa
     subcol1, subcol2 = st.columns(2)
     
     with subcol1:
@@ -120,7 +121,6 @@ with col1:
             total_estado = df_uf[df_uf['UF'] == estado_selecionado]['Quantidade'].values[0]
             whats_membros = whatsapp_data.get(estado_selecionado, 0)
             
-            # Evita erro de divisão por zero caso algum estado esteja vazio
             percentual = (whats_membros / total_estado * 100) if total_estado > 0 else 0
             
             st.markdown(f"""
@@ -162,8 +162,6 @@ with col2:
         df_cidades['% no Estado'] = (df_cidades['Qtd'] / total_estado * 100).round(2).astype(str) + '%'
         
         st.dataframe(df_cidades, use_container_width=True, hide_index=True)
-        
-        # OS TOTAIS DO RODAPÉ FORAM REMOVIDOS AQUI CONFORME SOLICITADO
         
     else:
         st.info("👈 Clique em um estado no mapa para ver a lista de cidades aqui.")
