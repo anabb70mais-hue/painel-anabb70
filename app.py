@@ -79,7 +79,18 @@ whatsapp_data = {
     'AM': 32, 'MT': 31, 'SC': 19, 'TO': 19, 'SE': 15
 }
 
-# TÍTULO ATUALIZADO: Centralizado, na cor branca e com o novo texto
+# Dicionário para converter sigla no nome completo do Estado
+nomes_estados = {
+    'AC': 'Acre', 'AL': 'Alagoas', 'AP': 'Amapá', 'AM': 'Amazonas',
+    'BA': 'Bahia', 'CE': 'Ceará', 'DF': 'Distrito Federal', 'ES': 'Espírito Santo',
+    'GO': 'Goiás', 'MA': 'Maranhão', 'MT': 'Mato Grosso', 'MS': 'Mato Grosso do Sul',
+    'MG': 'Minas Gerais', 'PA': 'Pará', 'PB': 'Paraíba', 'PR': 'Paraná',
+    'PE': 'Pernambuco', 'PI': 'Piauí', 'RJ': 'Rio de Janeiro', 'RN': 'Rio Grande do Norte',
+    'RS': 'Rio Grande do Sul', 'RO': 'Rondônia', 'RR': 'Roraima', 'SC': 'Santa Catarina',
+    'SP': 'São Paulo', 'SE': 'Sergipe', 'TO': 'Tocantins'
+}
+
+# TÍTULO ATUALIZADO: Centralizado, na cor branca
 st.markdown("<h1 style='text-align: center; color: white;'>Monitoramento de Associados por Estado</h1>", unsafe_allow_html=True)
 
 # 5. Dividindo a tela
@@ -123,9 +134,12 @@ with col1:
             
             percentual = (whats_membros / total_estado * 100) if total_estado > 0 else 0
             
+            # TRADUZINDO A SIGLA PARA O NOME COMPLETO AQUI
+            nome_completo = nomes_estados.get(estado_selecionado, estado_selecionado)
+            
             st.markdown(f"""
             <div class="metric-card">
-                <h4 style="margin:0 0 10px 0; color:#1f3b73;">{estado_selecionado}</h4>
+                <h4 style="margin:0 0 10px 0; color:#1f3b73;">{nome_completo}</h4>
                 <table style="width:100%; text-align:left; font-size:14px; border-collapse: collapse;">
                     <tr style="background-color: #e6e9ef;"><td style="padding: 5px;"><b>Sócio 70+</b></td><td style="text-align:right; padding: 5px;">{total_estado}</td></tr>
                     <tr><td style="padding: 5px;"><b>Whatsapp</b></td><td style="text-align:right; padding: 5px;">{whats_membros}</td></tr>
@@ -153,7 +167,9 @@ with col2:
     if len(event.selection.points) > 0:
         estado_selecionado = event.selection.points[0]['location']
         
-        st.subheader(f"Detalhamento: {estado_selecionado}")
+        # TRADUZINDO TAMBÉM O TÍTULO DA TABELA LATERAL (OPCIONAL, MAS RECOMENDADO)
+        nome_completo_tabela = nomes_estados.get(estado_selecionado, estado_selecionado)
+        st.subheader(f"Detalhamento: {nome_completo_tabela}")
         
         df_cidades = df[df['UF'] == estado_selecionado].groupby('Cidade').size().reset_index(name='Qtd')
         df_cidades = df_cidades.sort_values(by='Qtd', ascending=False).reset_index(drop=True)
